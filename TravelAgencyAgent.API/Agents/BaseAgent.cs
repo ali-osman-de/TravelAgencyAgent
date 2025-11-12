@@ -1,33 +1,34 @@
-using Microsoft.Agents.AI;
+﻿using Microsoft.Agents.AI;
+using Microsoft.SemanticKernel.Connectors.InMemory;
 using OpenAI;
-using TravelAgencyAgent.API.Interfaces;
+using TravelAgencyAgent.API.Agents.Interface;
 
 namespace TravelAgencyAgent.API.Agents;
 
-public class BaseAgent : IChatService
+public class BaseAgent : IBaseAgent
 {
     private readonly IConfiguration _configuration;
-    private readonly string _apiKey;
-    private readonly string _model;
-    private readonly AIAgent agent;
+    private readonly OpenAIClient _client;
+    private readonly string _defaultModel;
 
     public BaseAgent(IConfiguration configuration)
     {
         _configuration = configuration;
-        _apiKey = _configuration.GetValue<string>("Agent:ApiKey")!;
-        _model = _configuration.GetValue<string>("Agent:Model")!;
-
-#pragma warning disable OPENAI001 
-        agent = new OpenAIClient(
-            _apiKey)
-            .GetOpenAIResponseClient(_model)
-#pragma warning restore OPENAI001
-            .CreateAIAgent(instructions: "You are good at telling jokes.", name: "Joker");
+        var apiKey = _configuration.GetValue<string>("Agent:ApiKey")!;
+        _defaultModel = _configuration.GetValue<string>("Agent:Model")!;
+        _client = new OpenAIClient(apiKey);
     }
 
-    public async Task<string> GetResponseAsync(string userInput)
+    public AIAgent CreateAgent(string name, string instructions, string? model = null)
     {
-        var result = await agent.RunAsync(userInput);
-        return result.ToString();
+    #pragma warning disable OPENAI001
+        var aiAgent = _client
+            .GetOpenAIResponseClient(model ?? _defaultModel)
+            .CreateAIAgent(
+                instructions: instructions,
+                name: name);
+    #pragma warning restore OPENAI001
+
+        return aiAgent;
     }
 }
