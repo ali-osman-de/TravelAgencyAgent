@@ -9,8 +9,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddServiceExtensions(this IServiceCollection services)
     {
-        services.AddScoped<IBaseAgent, BaseAgent>();
-        services.AddScoped<IChatService, ChatService>();
+        services.AddSingleton<IBaseAgent, BaseAgent>();
+        services.AddSingleton<IChatService, ChatService>();
         return services;
     }
 }
