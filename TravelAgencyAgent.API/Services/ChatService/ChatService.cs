@@ -8,24 +8,24 @@ namespace TravelAgencyAgent.API.Services.ChatService;
 
 public class ChatService : IChatService
 {
-    private readonly AIAgent _chatAgent;
+    private readonly AIAgent _travelAgent;
+    private readonly AIAgent _bookingAgent;
     private readonly List<ChatMessage> _history = [];
     private readonly AgentThread _thread;
 
 
     public ChatService(IBaseAgent baseAgent)
     {
-        _chatAgent = baseAgent.CreateAgent(
-            name: "ChatAgent",
-            instructions: "You are a helpful travel agency assistant."
-        );
+        _travelAgent = baseAgent.GetTravelAgent();
+        
+        _bookingAgent = baseAgent.GetBookingAgent();
 
         _history.Add(new ChatMessage(
             ChatRole.System,
             "You are a helpful travel agency assistant."
         ));
 
-        _thread = baseAgent.CreateAgentThread(_chatAgent);
+        _thread = baseAgent.CreateAgentThread(_travelAgent);
 
     }
 
@@ -33,7 +33,7 @@ public class ChatService : IChatService
     {
         _history.Add(new ChatMessage(ChatRole.User, userInput));
 
-        AgentRunResponse runResponse = await _chatAgent.RunAsync(userInput);
+        AgentRunResponse runResponse = await _travelAgent.RunAsync(userInput);
 
         _history.AddRange(runResponse.Messages);
 
@@ -42,7 +42,7 @@ public class ChatService : IChatService
 
     public async Task<string> GetResponseThreadAsync(string userInput)
     {
-        AgentRunResponse runResponse = await _chatAgent.RunAsync(userInput, _thread);
+        AgentRunResponse runResponse = await _bookingAgent.RunAsync(userInput, _thread);
 
         return runResponse.Text;
     }

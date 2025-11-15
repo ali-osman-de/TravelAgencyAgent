@@ -10,12 +10,24 @@ public class BaseAgent : IBaseAgent
     private readonly OpenAIClient _client;
     private readonly string _defaultModel;
 
+    private readonly Lazy<AIAgent> _travelAgent;
+    private readonly Lazy<AIAgent> _bookingAgent;
     public BaseAgent(IConfiguration configuration)
     {
         _configuration = configuration;
         var apiKey = _configuration.GetValue<string>("Agent:ApiKey")!;
         _defaultModel = _configuration.GetValue<string>("Agent:Model")!;
         _client = new OpenAIClient(apiKey);
+
+        _travelAgent = new Lazy<AIAgent>(() => CreateAgent(
+            name: "TravelAgent",
+            instructions: "You are a helpful travel agency assistant."
+        ));
+
+        _bookingAgent = new Lazy<AIAgent>(() => CreateAgent(
+            name: "BookingAgent",
+            instructions: "You help with hotel and flight bookings."
+        ));
     }
 
     public AIAgent CreateAgent(string name, string instructions, string? model = null)
@@ -35,4 +47,6 @@ public class BaseAgent : IBaseAgent
     {
         return agent.GetNewThread();
     }
+    public AIAgent GetTravelAgent() => _travelAgent.Value;
+    public AIAgent GetBookingAgent() => _bookingAgent.Value;
 }
