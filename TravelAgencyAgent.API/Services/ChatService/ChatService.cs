@@ -25,7 +25,7 @@ public class ChatService : IChatService
             "You are a helpful travel agency assistant."
         ));
 
-        _thread = _chatAgent.GetNewThread();
+        _thread = baseAgent.CreateAgentThread(_chatAgent);
 
     }
 
@@ -33,7 +33,7 @@ public class ChatService : IChatService
     {
         _history.Add(new ChatMessage(ChatRole.User, userInput));
 
-        AgentRunResponse runResponse = await _chatAgent.RunAsync(_history);
+        AgentRunResponse runResponse = await _chatAgent.RunAsync(userInput);
 
         _history.AddRange(runResponse.Messages);
 

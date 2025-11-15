@@ -1,5 +1,4 @@
 ﻿using Microsoft.Agents.AI;
-using Microsoft.SemanticKernel.Connectors.InMemory;
 using OpenAI;
 using TravelAgencyAgent.API.Agents.Interface;
 
@@ -30,5 +29,10 @@ public class BaseAgent : IBaseAgent
     #pragma warning restore OPENAI001
 
         return aiAgent;
+    }
+
+    public AgentThread CreateAgentThread(AIAgent agent)
+    {
+        return agent.GetNewThread();
     }
 }
