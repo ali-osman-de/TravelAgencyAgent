@@ -10,7 +10,6 @@ public class ChatService : IChatService
 {
     private readonly AIAgent _chatAgent;
     private readonly List<ChatMessage> _history = [];
-    private readonly Dictionary<string, AgentThread> _threads = new();
     private readonly AgentThread _thread;
 
 
@@ -34,7 +33,7 @@ public class ChatService : IChatService
     {
         _history.Add(new ChatMessage(ChatRole.User, userInput));
 
-        AgentRunResponse runResponse = await _chatAgent.RunAsync(userInput);
+        AgentRunResponse runResponse = await _chatAgent.RunAsync(_history);
 
         _history.AddRange(runResponse.Messages);
 
